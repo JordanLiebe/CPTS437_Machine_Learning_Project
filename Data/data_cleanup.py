@@ -4,6 +4,14 @@ def getKeyOrNull(dictionary, key):
     else:
         return ''
 
+def joinArray(valueArray):
+    joinedValue = ''
+    for value in valueArray:
+        if joinedValue == '':
+            joinedValue = joinedValue + value
+        else:
+            joinedValue = joinedValue + ',' + value
+    return joinedValue
 
 class PlayerStatRecord:
     id = "-1"
@@ -65,16 +73,24 @@ class PlayerStatRecord:
     rushing_YDS = -1
     rushing_YPC = -1
 
-    def __init__(Id, Name, Team, Conference):
-        id = Id
-        name = Name
-        team = Team
-        confernece = Conference
+    def __init__(self, Id, Name, Team, Conference):
+        self.id = Id
+        self.name = Name
+        self.team = Team
+        self.conference = Conference
 
-    def ToCsvString(this):
-        return this.__dict__.keys()
+    def ToCsvString(self):
+        csvString = joinArray([self.id, self.name, self.team, self.conference, self.defensive_PD, self.defensive_QB_HUR, self.defensive_SACKS, self.defensive_SOLO, self.defensive_TD, self.defensive_TFL, 
+        self.defensive_TOT, self.fumbles_FUM, self.fumbles_LOST, self.fumbles_REC, self.interceptions_AVG, self.interceptions_INT, self.interceptions_TD, self.interceptions_YDS, self.kicking_FGA, 
+        self.kicking_FGM, self.kicking_LONG, self.kicking_PCT, self.kicking_PTS, self.kicking_XPA, self.kicking_XPM, self.kickReturns_AVG, self.kickReturns_LONG, self.kickReturns_NO, self.kickReturns_TD, 
+        self.kickReturns_YDS, self.passing_ATT, self.passing_COMPLETIONS, self.passing_INT, self.passing_PCT, self.passing_TD, self.passing_YDS, self.passing_YPA, self.punting_In_Twenty, self.punting_LONG,
+        self.punting_NO, self.punting_TB, self.punting_YDS, self.punting_YPP, self.puntReturns_AVG, self.puntReturns_LONG, self.puntReturns_NO, self.puntReturns_TD, self.puntReturns_YDS, self.receiving_LONG, 
+        self.receiving_REC, self.receiving_TD, self.receiving_YDS, self.receiving_YPR, self.rushing_CAR, self.rushing_LONG, self.rushing_TD, self.rushing_YDS, self.rushing_YPC])
+        return csvString + '\n'
+        
+        
 
-    def applyStats(this, stats):
+    def applyStats(self, stats):
         stat_dict = dict()
         
         for stat in stats:
@@ -82,60 +98,60 @@ class PlayerStatRecord:
             value = stat[6]
             stat_dict[key] = value
 
-        this.defensive_PD = getKeyOrNull(stat_dict, "defensive_PD")
-        this.defensive_QB_HUR = getKeyOrNull(stat_dict, "defensive_QB_HUR")
-        this.defensive_SACKS = getKeyOrNull(stat_dict, "defensive_SACKS")
-        this.defensive_SOLO = getKeyOrNull(stat_dict, "defensive_SOLO")
-        this.defensive_TD = getKeyOrNull(stat_dict, "defensive_TD")
-        this.defensive_TFL = getKeyOrNull(stat_dict, "defensive_TFL")
-        this.defensive_TOT = getKeyOrNull(stat_dict, "defensive_TOT")
-        this.fumbles_FUM = getKeyOrNull(stat_dict, "fumbles_FUM")
-        this.fumbles_LOST = getKeyOrNull(stat_dict, "fumbles_LOST")
-        this.fumbles_REC = getKeyOrNull(stat_dict, "fumbles_REC")
-        this.interceptions_AVG = getKeyOrNull(stat_dict, "interceptions_AVG")
-        this.interceptions_INT = getKeyOrNull(stat_dict, "interceptions_INT")
-        this.interceptions_TD = getKeyOrNull(stat_dict, "interceptions_TD")
-        this.interceptions_YDS = getKeyOrNull(stat_dict, "interceptions_YDS")
-        this.kicking_FGA = getKeyOrNull(stat_dict, "kicking_FGA")
-        this.kicking_FGM = getKeyOrNull(stat_dict, "kicking_FGM")
-        this.kicking_LONG = getKeyOrNull(stat_dict, "kicking_LONG")
-        this.kicking_PCT = getKeyOrNull(stat_dict, "kicking_PCT")
-        this.kicking_PTS = getKeyOrNull(stat_dict, "kicking_PTS")
-        this.kicking_XPA = getKeyOrNull(stat_dict, "kicking_XPA")
-        this.kicking_XPM = getKeyOrNull(stat_dict, "kicking_XPM")
-        this.kickReturns_AVG = getKeyOrNull(stat_dict, "kickReturns_AVG")
-        this.kickReturns_LONG = getKeyOrNull(stat_dict, "kickReturns_LONG")
-        this.kickReturns_NO = getKeyOrNull(stat_dict, "kickReturns_NO")
-        this.kickReturns_TD = getKeyOrNull(stat_dict, "kickReturns_TD")
-        this.kickReturns_YDS = getKeyOrNull(stat_dict, "kickReturns_YDS")
-        this.passing_ATT = getKeyOrNull(stat_dict, "passing_ATT")
-        this.passing_COMPLETIONS = getKeyOrNull(stat_dict, "passing_COMPLETIONS")
-        this.passing_INT = getKeyOrNull(stat_dict, "passing_INT")
-        this.passing_PCT = getKeyOrNull(stat_dict, "passing_PCT")
-        this.passing_TD = getKeyOrNull(stat_dict, "passing_TD")
-        this.passing_YDS = getKeyOrNull(stat_dict, "passing_YDS")
-        this.passing_YPA = getKeyOrNull(stat_dict, "passing_YPA")
-        this.punting_In_Twenty = getKeyOrNull(stat_dict, "punting_In_20")
-        this.punting_LONG = getKeyOrNull(stat_dict, "punting_LONG")
-        this.punting_NO = getKeyOrNull(stat_dict, "punting_NO")
-        this.punting_TB = getKeyOrNull(stat_dict, "punting_TB")
-        this.punting_YDS = getKeyOrNull(stat_dict, "punting_YDS")
-        this.punting_YPP = getKeyOrNull(stat_dict, "punting_YPP")
-        this.puntReturns_AVG = getKeyOrNull(stat_dict, "puntReturns_AVG")
-        this.puntReturns_LONG = getKeyOrNull(stat_dict, "puntReturns_LONG")
-        this.puntReturns_NO = getKeyOrNull(stat_dict, "puntReturns_NO")
-        this.puntReturns_TD = getKeyOrNull(stat_dict, "puntReturns_TD")
-        this.puntReturns_YDS = getKeyOrNull(stat_dict, "puntReturns_YDS")
-        this.receiving_LONG = getKeyOrNull(stat_dict, "receiving_LONG")
-        this.receiving_REC = getKeyOrNull(stat_dict, "receiving_REC")
-        this.receiving_TD = getKeyOrNull(stat_dict, "receiving_TD")
-        this.receiving_YDS = getKeyOrNull(stat_dict, "receiving_YDS")
-        this.receiving_YPR = getKeyOrNull(stat_dict, "receiving_YPR")
-        this.rushing_CAR = getKeyOrNull(stat_dict, "rushing_CAR")
-        this.rushing_LONG = getKeyOrNull(stat_dict, "rushing_LONG")
-        this.rushing_TD = getKeyOrNull(stat_dict, "rushing_TD")
-        this.rushing_YDS = getKeyOrNull(stat_dict, "rushing_YDS")
-        this.rushing_YPC = getKeyOrNull(stat_dict, "rushing_YPC")
+        self.defensive_PD = getKeyOrNull(stat_dict, "defensive_PD")
+        self.defensive_QB_HUR = getKeyOrNull(stat_dict, "defensive_QB_HUR")
+        self.defensive_SACKS = getKeyOrNull(stat_dict, "defensive_SACKS")
+        self.defensive_SOLO = getKeyOrNull(stat_dict, "defensive_SOLO")
+        self.defensive_TD = getKeyOrNull(stat_dict, "defensive_TD")
+        self.defensive_TFL = getKeyOrNull(stat_dict, "defensive_TFL")
+        self.defensive_TOT = getKeyOrNull(stat_dict, "defensive_TOT")
+        self.fumbles_FUM = getKeyOrNull(stat_dict, "fumbles_FUM")
+        self.fumbles_LOST = getKeyOrNull(stat_dict, "fumbles_LOST")
+        self.fumbles_REC = getKeyOrNull(stat_dict, "fumbles_REC")
+        self.interceptions_AVG = getKeyOrNull(stat_dict, "interceptions_AVG")
+        self.interceptions_INT = getKeyOrNull(stat_dict, "interceptions_INT")
+        self.interceptions_TD = getKeyOrNull(stat_dict, "interceptions_TD")
+        self.interceptions_YDS = getKeyOrNull(stat_dict, "interceptions_YDS")
+        self.kicking_FGA = getKeyOrNull(stat_dict, "kicking_FGA")
+        self.kicking_FGM = getKeyOrNull(stat_dict, "kicking_FGM")
+        self.kicking_LONG = getKeyOrNull(stat_dict, "kicking_LONG")
+        self.kicking_PCT = getKeyOrNull(stat_dict, "kicking_PCT")
+        self.kicking_PTS = getKeyOrNull(stat_dict, "kicking_PTS")
+        self.kicking_XPA = getKeyOrNull(stat_dict, "kicking_XPA")
+        self.kicking_XPM = getKeyOrNull(stat_dict, "kicking_XPM")
+        self.kickReturns_AVG = getKeyOrNull(stat_dict, "kickReturns_AVG")
+        self.kickReturns_LONG = getKeyOrNull(stat_dict, "kickReturns_LONG")
+        self.kickReturns_NO = getKeyOrNull(stat_dict, "kickReturns_NO")
+        self.kickReturns_TD = getKeyOrNull(stat_dict, "kickReturns_TD")
+        self.kickReturns_YDS = getKeyOrNull(stat_dict, "kickReturns_YDS")
+        self.passing_ATT = getKeyOrNull(stat_dict, "passing_ATT")
+        self.passing_COMPLETIONS = getKeyOrNull(stat_dict, "passing_COMPLETIONS")
+        self.passing_INT = getKeyOrNull(stat_dict, "passing_INT")
+        self.passing_PCT = getKeyOrNull(stat_dict, "passing_PCT")
+        self.passing_TD = getKeyOrNull(stat_dict, "passing_TD")
+        self.passing_YDS = getKeyOrNull(stat_dict, "passing_YDS")
+        self.passing_YPA = getKeyOrNull(stat_dict, "passing_YPA")
+        self.punting_In_Twenty = getKeyOrNull(stat_dict, "punting_In_20")
+        self.punting_LONG = getKeyOrNull(stat_dict, "punting_LONG")
+        self.punting_NO = getKeyOrNull(stat_dict, "punting_NO")
+        self.punting_TB = getKeyOrNull(stat_dict, "punting_TB")
+        self.punting_YDS = getKeyOrNull(stat_dict, "punting_YDS")
+        self.punting_YPP = getKeyOrNull(stat_dict, "punting_YPP")
+        self.puntReturns_AVG = getKeyOrNull(stat_dict, "puntReturns_AVG")
+        self.puntReturns_LONG = getKeyOrNull(stat_dict, "puntReturns_LONG")
+        self.puntReturns_NO = getKeyOrNull(stat_dict, "puntReturns_NO")
+        self.puntReturns_TD = getKeyOrNull(stat_dict, "puntReturns_TD")
+        self.puntReturns_YDS = getKeyOrNull(stat_dict, "puntReturns_YDS")
+        self.receiving_LONG = getKeyOrNull(stat_dict, "receiving_LONG")
+        self.receiving_REC = getKeyOrNull(stat_dict, "receiving_REC")
+        self.receiving_TD = getKeyOrNull(stat_dict, "receiving_TD")
+        self.receiving_YDS = getKeyOrNull(stat_dict, "receiving_YDS")
+        self.receiving_YPR = getKeyOrNull(stat_dict, "receiving_YPR")
+        self.rushing_CAR = getKeyOrNull(stat_dict, "rushing_CAR")
+        self.rushing_LONG = getKeyOrNull(stat_dict, "rushing_LONG")
+        self.rushing_TD = getKeyOrNull(stat_dict, "rushing_TD")
+        self.rushing_YDS = getKeyOrNull(stat_dict, "rushing_YDS")
+        self.rushing_YPC = getKeyOrNull(stat_dict, "rushing_YPC")
 
 def getUniquePlayers(filename):
     playerFile = open(filename, 'r')
@@ -182,12 +198,20 @@ def compressPlayerRecords(playerIds, allPlayerRecords):
         playerTeam = playerRecords[0][2]
         playerConference = playerRecords[0][3]
 
-        playerStats = PlayerStatRecord(playerName, playerTeam, playerConference)
+        playerStats = PlayerStatRecord(id, playerName, playerTeam, playerConference)
         playerStats.applyStats(playerRecords)
         playerStatArray.append(playerStats)
         
     return playerStatArray
 
+def writeRecordsToCsvFile(file, statRecords):
+    outputLines = []
+    for record in statRecords:
+        line = record.ToCsvString()
+        outputLines.append(line)
+
+    playerFile = open(file, 'w+')
+    Lines = playerFile.writelines(outputLines)
 
 def main():
     playerStatFile = 'Data/2022_player_stat_data.csv'
@@ -197,6 +221,6 @@ def main():
 
     playerStatRecords = compressPlayerRecords(uniquePlayerIds, playerRecords)
 
-    playerStatRecords[0].ToCsvString()
+    writeRecordsToCsvFile('Data/2022_player_stat_data_compressed.csv', playerStatRecords)
 
 main()
