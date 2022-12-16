@@ -2,7 +2,7 @@ def getKeyOrNull(dictionary, key):
     if key in dictionary.keys():
         return dictionary[key]
     else:
-        return ''
+        return '0'
 
 def joinArray(valueArray):
     joinedValue = ''
@@ -18,6 +18,7 @@ class PlayerStatRecord:
     name = "Unknown"
     team = "Unknown"
     conference = "Unknown"
+    drafted = False
     defensive_PD = -1
     defensive_QB_HUR = -1
     defensive_SACKS = -1
@@ -73,22 +74,21 @@ class PlayerStatRecord:
     rushing_YDS = -1
     rushing_YPC = -1
 
-    def __init__(self, Id, Name, Team, Conference):
+    def __init__(self, Id, Name, Team, Conference, Drafted):
         self.id = Id
         self.name = Name
         self.team = Team
         self.conference = Conference
+        self.drafted = Drafted
 
     def ToCsvString(self):
-        csvString = joinArray([self.id, self.name, self.team, self.conference, self.defensive_PD, self.defensive_QB_HUR, self.defensive_SACKS, self.defensive_SOLO, self.defensive_TD, self.defensive_TFL, 
+        csvString = joinArray([self.id, self.defensive_PD, self.defensive_QB_HUR, self.defensive_SACKS, self.defensive_SOLO, self.defensive_TD, self.defensive_TFL, 
         self.defensive_TOT, self.fumbles_FUM, self.fumbles_LOST, self.fumbles_REC, self.interceptions_AVG, self.interceptions_INT, self.interceptions_TD, self.interceptions_YDS, self.kicking_FGA, 
         self.kicking_FGM, self.kicking_LONG, self.kicking_PCT, self.kicking_PTS, self.kicking_XPA, self.kicking_XPM, self.kickReturns_AVG, self.kickReturns_LONG, self.kickReturns_NO, self.kickReturns_TD, 
         self.kickReturns_YDS, self.passing_ATT, self.passing_COMPLETIONS, self.passing_INT, self.passing_PCT, self.passing_TD, self.passing_YDS, self.passing_YPA, self.punting_In_Twenty, self.punting_LONG,
         self.punting_NO, self.punting_TB, self.punting_YDS, self.punting_YPP, self.puntReturns_AVG, self.puntReturns_LONG, self.puntReturns_NO, self.puntReturns_TD, self.puntReturns_YDS, self.receiving_LONG, 
-        self.receiving_REC, self.receiving_TD, self.receiving_YDS, self.receiving_YPR, self.rushing_CAR, self.rushing_LONG, self.rushing_TD, self.rushing_YDS, self.rushing_YPC])
+        self.receiving_REC, self.receiving_TD, self.receiving_YDS, self.receiving_YPR, self.rushing_CAR, self.rushing_LONG, self.rushing_TD, self.rushing_YDS, self.rushing_YPC, self.drafted])
         return csvString + '\n'
-        
-        
 
     def applyStats(self, stats):
         stat_dict = dict()
@@ -189,23 +189,46 @@ def getPlayerRecords(filename):
 
     return allPlayerRecords
 
-def compressPlayerRecords(playerIds, allPlayerRecords):
+def getDraftPicks(filename):
+    playerFile = open(filename, 'r')
+    Lines = playerFile.readlines()
+
+    allDraftPicks = []
+
+    firstline = True
+    for line in Lines:
+        if(firstline):
+            firstline = False
+            continue
+
+        splitLine = line.strip().split(',')
+        allDraftPicks.append(splitLine)
+
+    return allDraftPicks
+
+def compressPlayerRecords(playerIds, allPlayerRecords, allDraftRecords):
     playerStatArray = []
 
     for id in playerIds:
         playerRecords = [pr for pr in allPlayerRecords if pr[0] == id]
+        draftRecords = [dr for dr in allDraftRecords if dr[0] == id]
         playerName = playerRecords[0][1]
         playerTeam = playerRecords[0][2]
         playerConference = playerRecords[0][3]
+        playerDrafted = '0'
+        if len(draftRecords) > 0:
+            playerDrafted = '1'
 
-        playerStats = PlayerStatRecord(id, playerName, playerTeam, playerConference)
+        playerStats = PlayerStatRecord(id, playerName, playerTeam, playerConference, playerDrafted)
         playerStats.applyStats(playerRecords)
         playerStatArray.append(playerStats)
         
     return playerStatArray
 
 def writeRecordsToCsvFile(file, statRecords):
+    headers = "id,defensive_PD,defensive_QB_HUR,defensive_SACKS,defensive_SOLO,defensive_TD,defensive_TFL,defensive_TOT,fumbles_FUM,fumbles_LOST,fumbles_REC,interceptions_AVG,interceptions_INT,interceptions_TD,interceptions_YDS,kicking_FGA,kicking_FGM,kicking_LONG,kicking_PCT,kicking_PTS,kicking_XPA,kicking_XPM,kickReturns_AVG,kickReturns_LONG,kickReturns_NO,kickReturns_TD,kickReturns_YDS,passing_ATT,passing_COMPLETIONS,passing_INT,passing_PCT,passing_TD,passing_YDS,passing_YPA,punting_In_Twenty,punting_LONG,punting_NO,punting_TB,punting_YDS,punting_YPP,puntReturns_AVG,puntReturns_LONG,puntReturns_NO,puntReturns_TD,puntReturns_YDS,receiving_LONG,receiving_REC,receiving_TD,receiving_YDS,receiving_YPR,rushing_CAR,rushing_LONG,rushing_TD,rushing_YDS,rushing_YPC,drafted\n"
     outputLines = []
+    outputLines.append(headers)
     for record in statRecords:
         line = record.ToCsvString()
         outputLines.append(line)
@@ -215,12 +238,16 @@ def writeRecordsToCsvFile(file, statRecords):
 
 def main():
     playerStatFile = 'Data/2022_player_stat_data.csv'
+    nflDraftFile = 'Data/2022_nfl_draft_data.csv'
+    includeClasses = False
 
     uniquePlayerIds = getUniquePlayers(playerStatFile)
     playerRecords = getPlayerRecords(playerStatFile)
 
-    playerStatRecords = compressPlayerRecords(uniquePlayerIds, playerRecords)
+    draftPickList = getDraftPicks(nflDraftFile)
 
-    writeRecordsToCsvFile('Data/2022_player_stat_data_compressed.csv', playerStatRecords)
+    playerStatRecords = compressPlayerRecords(uniquePlayerIds, playerRecords, draftPickList)
+
+    writeRecordsToCsvFile('Data/2021_player_stat_data_compressed.csv', playerStatRecords)
 
 main()
