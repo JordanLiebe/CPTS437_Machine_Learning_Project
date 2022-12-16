@@ -1,84 +1,60 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import numpy as np
 from sklearn.preprocessing import StandardScaler
- 
-df = pd.read_csv("Data/2021_player_stat_data_compressed.csv", index_col = 0)
- 
-df.head()
-
-scaler = StandardScaler()
- 
-scaler.fit(df.drop(['drafted'], axis = 1))
-scaled_features = scaler.transform(df.drop(['drafted'], axis = 1))
- 
-df_feat = pd.DataFrame(scaled_features, columns = df.columns[:-1])
-df_feat.head()
-
 from sklearn.model_selection import train_test_split
- 
-X_train, X_test, y_train, y_test = train_test_split(
-      scaled_features, df['drafted'], test_size = 0.30)
- 
-# Remember that we are trying to come up
-# with a model to predict whether
-# someone will TARGET CLASS or not.
-# We'll start with k = 1.
- 
 from sklearn.neighbors import KNeighborsClassifier
- 
-knn = KNeighborsClassifier(n_neighbors = 1)
- 
-knn.fit(X_train, y_train)
-pred = knn.predict(X_test)
- 
-# Predictions and Evaluations
-# Let's evaluate our KNN model !
 from sklearn.metrics import classification_report, confusion_matrix
-print(confusion_matrix(y_test, pred))
- 
-print(classification_report(y_test, pred))
 
-error_rate = []
- 
-# Will take some time
-for i in range(1, 40):
-     
-    knn = KNeighborsClassifier(n_neighbors = i)
-    knn.fit(X_train, y_train)
-    pred_i = knn.predict(X_test)
-    error_rate.append(np.mean(pred_i != y_test))
- 
-plt.figure(figsize =(10, 6))
-plt.plot(range(1, 40), error_rate, color ='blue',
-                linestyle ='dashed', marker ='o',
-         markerfacecolor ='red', markersize = 10)
- 
-plt.title('Error Rate vs. K Value')
-plt.xlabel('K')
-plt.ylabel('Error Rate')
+def retrieveStatsFromFiles():
+    # Retrieve data from csv files #
+    playerStats21 = pd.read_csv("Data/2021_player_stat_data_compressed.csv", index_col = 0)
+    playerStats22 = pd.read_csv("Data/2022_player_stat_data_compressed.csv", index_col = 0)
 
-# FIRST A QUICK COMPARISON TO OUR ORIGINAL K = 1
-knn = KNeighborsClassifier(n_neighbors = 1)
- 
-knn.fit(X_train, y_train)
-pred = knn.predict(X_test)
- 
-print('WITH K = 1')
-print('\n')
-print(confusion_matrix(y_test, pred))
-print('\n')
-print(classification_report(y_test, pred))
- 
- 
-# NOW WITH K = 15
-knn = KNeighborsClassifier(n_neighbors = 15)
- 
-knn.fit(X_train, y_train)
-pred = knn.predict(X_test)
- 
-print('WITH K = 15')
-print('\n')
-print(confusion_matrix(y_test, pred))
-print('\n')
-print(classification_report(y_test, pred))
+    return playerStats21, playerStats22
+
+def normalizedStats(stats):
+    # Create two scalers to normalize the dataframes #
+    scaler = StandardScaler()
+    scaler.fit(stats.drop(['drafted'], axis = 1))
+    scaled_features = scaler.transform(stats.drop(['drafted'], axis = 1))
+    normalized_features = pd.DataFrame(scaled_features, columns = stats.columns[:-1])
+
+    return normalized_features
+
+def main():
+    # number of clusters to generate
+    numOfNeighbors = 3
+
+    # retrieve player stats from compressed files #
+    playerStats21, playerStats22 = retrieveStatsFromFiles()
+
+    # normalize stats and return #
+    normalizedStats21 = normalizedStats(playerStats21)
+    normalizedStats22 = normalizedStats(playerStats22)
+
+    # split 2021 data set into test and training and return in pieces #
+    X_train21, X_test21, Y_train21, Y_test21 = train_test_split(normalizedStats21, playerStats21['drafted'], test_size = 0.5)
+
+    # Instantiate classifier and fit it to the training data #
+    trained_classifier = KNeighborsClassifier(n_neighbors = numOfNeighbors)
+    trained_classifier.fit(X_train21, Y_train21)
+
+    # Make predictions on test data #
+    pred21 = trained_classifier.predict(X_test21)
+    
+    # Printing confusion matrix from 2021 data #
+    print(confusion_matrix(Y_test21, pred21))
+    print('\n')
+    # Printing classification report from 2021 data #
+    print(classification_report(Y_test21, pred21))
+
+    # Loading test data from 2022 data #
+    _, X_test22, _, _ = train_test_split(
+        normalizedStats22, playerStats22['drafted'], test_size = 1)
+
+    # make another set of predictions based of 2022 data to see who might be a possible nfl draft candidate #
+    pred22 = trained_classifier.predict(X_test22)
+    print(pred22)
+
+    # From here I need to take the predictions for 2022 and form a report on which players are candidates from the drafts
+
+main()
