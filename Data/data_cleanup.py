@@ -238,8 +238,8 @@ def writeRecordsToCsvFile(file, statRecords):
 
 def main():
     playerStatFile = 'Data/2022_player_stat_data.csv'
-    nflDraftFile = 'Data/2022_nfl_draft_data.csv'
-    includeClasses = False
+    nflDraftFile = 'Data/2021_nfl_draft_data.csv'
+    compressedOutputFile = 'Data/2022_player_stat_data_compressed.csv'
 
     uniquePlayerIds = getUniquePlayers(playerStatFile)
     playerRecords = getPlayerRecords(playerStatFile)
@@ -248,6 +248,6 @@ def main():
 
     playerStatRecords = compressPlayerRecords(uniquePlayerIds, playerRecords, draftPickList)
 
-    writeRecordsToCsvFile('Data/2021_player_stat_data_compressed.csv', playerStatRecords)
+    writeRecordsToCsvFile(compressedOutputFile, playerStatRecords)
 
 main()
